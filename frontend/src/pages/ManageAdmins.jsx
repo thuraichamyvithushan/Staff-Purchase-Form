@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 const ManageAdmins = () => {
     const { user } = useAuth();
@@ -14,7 +15,7 @@ const ManageAdmins = () => {
     const fetchStaff = async () => {
         try {
             const token = await user.getIdToken();
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/staff`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/staff`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -36,7 +37,7 @@ const ManageAdmins = () => {
 
         try {
             const token = await user.getIdToken();
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/users/${uid}/role`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/users/${uid}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ const ManageAdmins = () => {
 
         try {
             const token = await user.getIdToken();
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/users/${uid}`, {
+            const response = await fetch(`${API_BASE_URL}/api/admin/users/${uid}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -135,8 +136,8 @@ const ManageAdmins = () => {
                                         </td>
                                         <td className="px-8 py-6 whitespace-nowrap">
                                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${member.role === 'admin'
-                                                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                                                    : 'bg-gray-100 text-gray-700 border border-gray-200'
+                                                ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                                : 'bg-gray-100 text-gray-700 border border-gray-200'
                                                 }`}>
                                                 {member.role || 'GUEST'}
                                             </span>
@@ -153,8 +154,8 @@ const ManageAdmins = () => {
                                                     onClick={() => handleRoleChange(member.id, member.role, member.name || member.email)}
                                                     disabled={member.email === user.email}
                                                     className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 ${member.role === 'admin'
-                                                            ? 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                                                            : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                                        ? 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                                                        : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
                                                         } disabled:opacity-30 disabled:cursor-not-allowed`}
                                                 >
                                                     {member.role === 'admin' ? 'Demote' : 'Promote'}

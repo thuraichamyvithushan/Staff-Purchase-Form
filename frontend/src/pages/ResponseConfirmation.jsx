@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 const ResponseConfirmation = () => {
     const { token } = useParams();
@@ -17,7 +18,7 @@ const ResponseConfirmation = () => {
     const submitResponse = async (finalNote = '') => {
         setIsSubmitting(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/respond/${token}?action=${action}`, {
+            const response = await fetch(`${API_BASE_URL}/api/respond/${token}?action=${action}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ note: finalNote || note })
@@ -50,7 +51,7 @@ const ResponseConfirmation = () => {
 
         const fetchRequestDetails = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/public/request/${token}`);
+                const response = await fetch(`${API_BASE_URL}/api/public/request/${token}`);
                 const data = await response.json();
                 if (response.ok) {
                     setRequestData(data);

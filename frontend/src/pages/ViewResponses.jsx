@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 const ViewResponses = () => {
     const { user } = useAuth();
@@ -35,7 +36,7 @@ const ViewResponses = () => {
             if (filters.employee) queryParams.append('employee', filters.employee);
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/purchase-requests?${queryParams}`,
+                `${API_BASE_URL}/api/admin/purchase-requests?${queryParams}`,
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
@@ -60,7 +61,7 @@ const ViewResponses = () => {
         try {
             const token = await user.getIdToken();
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/purchase-requests/${requestToDelete}`,
+                `${API_BASE_URL}/api/admin/purchase-requests/${requestToDelete}`,
                 {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }

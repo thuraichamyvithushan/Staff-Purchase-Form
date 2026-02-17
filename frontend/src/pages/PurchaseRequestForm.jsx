@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 const PRODUCT_LIST = [
     "STELLAR 3.0 - SX60L 3.0",
@@ -124,8 +125,8 @@ const PurchaseRequestForm = () => {
         try {
             const isPublic = !user;
             const endpoint = isPublic
-                ? `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/public/purchase-requests`
-                : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/purchase-requests`;
+                ? `${API_BASE_URL}/api/public/purchase-requests`
+                : `${API_BASE_URL}/api/admin/purchase-requests`;
 
             const headers = { 'Content-Type': 'application/json' };
             if (!isPublic) {
