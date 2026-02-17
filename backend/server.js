@@ -20,6 +20,14 @@ const authController = require('./controllers/authController');
 const purchaseController = require('./controllers/purchaseController');
 const { initCron } = require('./services/cronService');
 
+app.get('/', (req, res) => {
+    res.json({
+        message: "Staff Purchase Form Backend API is running.",
+        version: "1.0.0",
+        status: "healthy"
+    });
+});
+
 app.get('/api/respond/:token', purchaseController.handleResponse);
 app.post('/api/respond/:token', purchaseController.handleResponse);
 app.get('/api/public/request/:token', purchaseController.getRequestByToken);
