@@ -10,6 +10,7 @@ import PurchaseRequestForm from './pages/PurchaseRequestForm';
 import ViewResponses from './pages/ViewResponses';
 import ResponseConfirmation from './pages/ResponseConfirmation';
 import ManageAdmins from './pages/ManageAdmins';
+import ManageProducts from './pages/ManageProducts';
 import Profile from './pages/Profile';
 import Unauthorized from './pages/Unauthorized';
 import DashboardLayout from './components/DashboardLayout';
@@ -76,6 +77,7 @@ function App() {
             <Route path="create-request" element={<PurchaseRequestForm />} />
             <Route path="responses" element={<ViewResponses />} />
             <Route path="admins" element={<ManageAdmins />} />
+            <Route path="products" element={<ManageProducts />} />
             <Route path="profile" element={<Profile />} />
           </Route>
 

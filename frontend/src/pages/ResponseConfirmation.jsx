@@ -94,7 +94,7 @@ const ResponseConfirmation = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center p-4 sm:p-8 font-['Inter',sans-serif]">
+        <div className="min-h-screen flex flex-col items-center justify-center px-[10px] py-4 sm:p-8 font-['Inter',sans-serif]">
             <div className="mb-12 animate-fade-in">
                 <img src="/assets/logo.png" alt="Huntsman Optics" className="h-16 w-auto grayscale-0 hover:grayscale-0 transition-all duration-700" />
             </div>
@@ -213,12 +213,11 @@ const ResponseConfirmation = () => {
                                 <button
                                     onClick={handleConfirm}
                                     disabled={isSubmitting || (action === 'confirm' && !termsAgreed)}
-                                    className={`w-full py-6 px-10 rounded-3xl text-white font-black text-lg transition-all duration-300 transform active:scale-95 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-3
-                                        ${isSubmitting
-                                            ? 'bg-black cursor-not-allowed shadow-none'
-                                            : (action === 'confirm' && !termsAgreed)
-                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
-                                                : 'bg-gradient-to-r from-red-600 to-red-800 hover:scale-[1.02]'
+                                    className={`w-full py-6 px-10 rounded-3xl text-white font-black text-lg transition-all duration-300 transform shadow-xl flex items-center justify-center space-x-3
+                                        bg-red-600 hover:bg-black hover:shadow-2xl active:scale-95
+                                        ${(isSubmitting || (action === 'confirm' && !termsAgreed))
+                                            ? 'cursor-not-allowed'
+                                            : ''
                                         }`}
                                 >
                                     {isSubmitting ? (

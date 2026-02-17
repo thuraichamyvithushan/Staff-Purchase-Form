@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
+const BASE_URL = process.env.BASE_URL;
 
 const _esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -76,6 +76,8 @@ const getHtmlBody = (type, data) => {
       <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
         <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Store Name</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${_esc(request.storeName)}</td></tr>
         <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Employee</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${_esc(request.employeeName)}</td></tr>
+        ${request.adminEmail ? `<tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">User Account</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${_esc(request.adminEmail)}</td></tr>` : ''}
+        ${request.email ? `<tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Sight App Email</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};"><a href="mailto:${_esc(request.email)}" style="color: ${textDark}; text-decoration: none;">${_esc(request.email)}</a></td></tr>` : ''}
         <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Product Model</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${primaryRed};">${_esc(request.productModel)}</td></tr>
         <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Discount</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${_esc(request.discount)}</td></tr>
         ${request.serialNumber ? `<tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Serial Number</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${_esc(request.serialNumber)}</td></tr>` : ''}

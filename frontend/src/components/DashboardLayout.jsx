@@ -165,7 +165,7 @@ const DashboardLayout = () => {
                 </div>
             </nav>
 
-            <main className="flex-grow p-4 sm:p-6 lg:p-8 animate-fade-in relative z-10">
+            <main className="flex-grow px-[10px] py-4 sm:p-6 lg:p-8 animate-fade-in relative z-10">
                 <div className="max-w-7xl mx-auto">
                     <Outlet />
                 </div>

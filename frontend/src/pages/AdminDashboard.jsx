@@ -73,6 +73,35 @@ const AdminDashboard = () => {
                 </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div
+                    onClick={() => navigate('/dashboard/admins')}
+                    className="bg-white/95 backdrop-blur-lg p-10 rounded-[2.5rem] shadow-2xl border border-white/20 cursor-pointer transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_20px_60px_rgba(220,38,38,0.15)] flex flex-col items-center justify-center text-center group relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gray-500/5 rounded-full -mr-16 -mt-16 transition-transform duration-500 group-hover:scale-150"></div>
+                    <div className="p-5 rounded-3xl mb-6 shadow-xl transition-all duration-500 group-hover:rotate-6 group-hover:scale-110" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' }}>
+                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">Manage Admins</h2>
+                    <p className="text-gray-500 text-lg font-medium leading-relaxed max-w-sm">Control access, approve new users, and manage staff roles.</p>
+                </div>
+
+                <div
+                    onClick={() => navigate('/dashboard/products')}
+                    className="bg-white/95 backdrop-blur-lg p-10 rounded-[2.5rem] shadow-2xl border border-white/20 cursor-pointer transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_20px_60px_rgba(220,38,38,0.15)] flex flex-col items-center justify-center text-center group relative overflow-hidden"
+                >
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-red-500/5 rounded-full -ml-16 -mt-16 transition-transform duration-500 group-hover:scale-150"></div>
+                    <div className="p-5 rounded-3xl mb-6 shadow-xl transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110" style={{ background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' }}>
+                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">Manage Products</h2>
+                    <p className="text-gray-500 text-lg font-medium leading-relaxed max-w-sm">Add, remove, and update the list of available product models.</p>
+                </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                 <div
                     onClick={() => navigate('/dashboard/responses?status=Pending')}
@@ -95,8 +124,8 @@ const AdminDashboard = () => {
                     <div className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Rejected</div>
                     <div className="text-5xl font-black text-red-600">{stats.rejected}</div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

@@ -81,7 +81,7 @@ const ManageAdmins = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 animate-fade-in py-6 px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto space-y-10 animate-fade-in py-6 px-[10px] sm:px-6 lg:px-8 relative z-10">
             <header className="text-center sm:text-left">
                 <h1 className="text-4xl font-extrabold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent mb-2">Manage Admins</h1>
                 <p className="text-gray-600 text-lg font-medium">Control system access and user roles</p>

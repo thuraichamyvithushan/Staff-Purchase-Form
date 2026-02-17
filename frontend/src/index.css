@@ -17,6 +17,10 @@
 }
 
 @layer utilities {
+    .btn-primary-red {
+        @apply bg-red-600 text-white font-black hover:bg-black transition-all duration-300 transform active:scale-95 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-3;
+    }
+
     .glass-card {
         @apply bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20;
     }

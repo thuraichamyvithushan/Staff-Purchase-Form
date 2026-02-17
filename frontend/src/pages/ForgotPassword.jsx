@@ -33,7 +33,7 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center py-12 px-[10px] sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 animate-fade-in">
                 <div className="bg-white/95 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-gray-100 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] transition-all duration-500">
                     <div className="mb-8 text-center">

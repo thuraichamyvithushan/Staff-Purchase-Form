@@ -85,7 +85,6 @@ exports.syncUser = async (req, res) => {
 
         await userRef.set(userData, { merge: true });
 
-        // If it's a new user and they are pending approval, send notifications
         if (isNewUser && role === 'pending') {
             try {
                 // To Admin
@@ -148,10 +147,8 @@ exports.updateUserRole = async (req, res) => {
 
         await userRef.update({ role });
 
-        // Send email if the role has changed (promotion or role shift)
         if (oldRole !== role) {
             try {
-                // Get the current admin's name who is making the change
                 const adminDoc = await db.collection('users').doc(req.user.uid).get();
                 const senderName = adminDoc.exists ? (adminDoc.data().name || adminDoc.data().email) : req.user.email;
 

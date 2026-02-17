@@ -18,6 +18,7 @@ app.use((req, res, next) => {
 
 const authController = require('./controllers/authController');
 const purchaseController = require('./controllers/purchaseController');
+const productController = require('./controllers/productController');
 const { initCron } = require('./services/cronService');
 
 app.get('/', (req, res) => {
@@ -38,6 +39,11 @@ app.get('/api/admin/purchase-requests', authController.protect, authController.a
 app.get('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.getPurchaseRequestById);
 app.post('/api/admin/test-reminder', authController.protect, authController.adminOnly, purchaseController.testReminder);
 app.delete('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.deletePurchaseRequest);
+
+// Product Management
+app.get('/api/products', productController.getProducts); // Public for form access
+app.post('/api/admin/products', authController.protect, authController.adminOnly, productController.addProduct);
+app.delete('/api/admin/products/:id', authController.protect, authController.adminOnly, productController.deleteProduct);
 
 app.post('/api/auth/sync', authController.protect, authController.syncUser);
 

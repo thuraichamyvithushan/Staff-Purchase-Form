@@ -5,60 +5,79 @@ const { sendEmail } = require('./emailService');
 const COLLECTION_NAME = 'purchaseRequests';
 
 const initCron = () => {
-  // TEST MODE: Run every minute (Original: 0 9 * * *)
-  cron.schedule('* * * * *', async () => {
-    console.log('Running reminder check (TEST MODE: Every Minute)...');
+  // LIVE MODE: Run daily at 8:00 AM
+  cron.schedule('0 8 * * *', async () => {
+    console.log('Running daily reminder check...');
     try {
+      // Get all pending requests
       const snapshot = await db.collection(COLLECTION_NAME).where('status', '==', 'Pending').get();
-      const rebateEmail = process.env.REBATE_EMAIL || 'rebate@example.com';
 
       if (snapshot.empty) {
-        console.log('No pending requests to remind.');
+        console.log('No pending requests found.');
         return;
       }
 
-      const today = new Date().setHours(0, 0, 0, 0);
+      console.log(`Found ${snapshot.size} pending requests. Checking for reminders...`);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
       snapshot.forEach(async (doc) => {
         const request = doc.data();
+        const requestId = doc.id;
 
-        // Skip if reminder sent today (DISABLED FOR TESTING)
-        /*
+        // Check if reminder was already sent today
         if (request.lastReminderSent) {
-          const lastSent = new Date(request.lastReminderSent).setHours(0, 0, 0, 0);
-          if (today === lastSent) return;
+          const lastSent = new Date(request.lastReminderSent);
+          lastSent.setHours(0, 0, 0, 0);
+
+          if (lastSent.getTime() === today.getTime()) {
+            // Reminder already sent today, skip
+            return;
+          }
         }
-        */
 
-        const requestData = { id: doc.id, ...request };
-        const recipient = request.email || rebateEmail;
+        // Logic to check if it's been 1 day could be added here if needed, 
+        // but "daily reminder" implies checking every day for pending items.
+        // Assuming every pending item gets a reminder once a day.
 
-        await sendEmail(recipient, 'reminder', {
-          request: requestData,
-          token: request.responseToken
-        });
+        const recipient = request.email;
+        // Fallback or specific logic if email is missing?
+        if (!recipient) {
+          console.log(`Skipping request ${requestId}: No email found.`);
+          return;
+        }
 
-        // Update doc
-        const emailLog = request.emailSentLog || [];
-        emailLog.push({
-          sentAt: new Date().toISOString(),
-          type: 'reminder'
-        });
+        try {
+          await sendEmail(recipient, 'reminder', {
+            request: { id: requestId, ...request },
+            token: request.responseToken
+          });
 
-        await db.collection(COLLECTION_NAME).doc(doc.id).update({
-          reminderCount: (request.reminderCount || 0) + 1,
-          lastReminderSent: new Date().toISOString(),
-          emailSentLog: emailLog
-        });
+          // Update doc
+          const emailLog = request.emailSentLog || [];
+          emailLog.push({
+            sentAt: new Date().toISOString(),
+            type: 'reminder'
+          });
 
-        console.log(`Reminder sent for request ${doc.id} to ${recipient}`);
+          await db.collection(COLLECTION_NAME).doc(requestId).update({
+            reminderCount: (request.reminderCount || 0) + 1,
+            lastReminderSent: new Date().toISOString(),
+            emailSentLog: emailLog
+          });
+
+          console.log(`Reminder sent for request ${requestId} to ${recipient}`);
+        } catch (emailError) {
+          console.error(`Failed to send reminder for ${requestId}:`, emailError);
+        }
       });
     } catch (error) {
       console.error('Error in daily reminder job:', error);
     }
   });
 
-  console.log('✓ Cron Job Scheduled (TEST MODE: Every Minute Reminders)');
+  console.log('✓ Cron Job Scheduled (LIVE MODE: Daily Reminders at 8:00 AM)');
 };
 
 // Check overdues - removed as per new requirements

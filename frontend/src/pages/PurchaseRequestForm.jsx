@@ -1,82 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
 
-const PRODUCT_LIST = [
-    "STELLAR 3.0 - SX60L 3.0",
-    "STELLAR 3.0 - SX60LS 3.0",
-    "STELLAR 3.0 - SQ50L 3.0",
-    "STELLAR 3.0- SQ35L 3.0",
-    "STELLAR 3.0- SH50L 3.0",
-    "STELLAR 3.0- SH35L 3.0",
-    "STELLAR 3.0- SH35 3.0",
-    "CONDOR - CQ50L 2.0",
-    "CONDOR - CQ35L 2.0",
-    "CONDOR- CH35L",
-    "CONDOR - CH25L",
-    "HABROK - HX60L 4K",
-    "HABROK - HX60LS 4K",
-    "HABROK -HQ50L",
-    "HABROK - HQ35L 4K",
-    "HABROK - HH35L 4K",
-    "HABROK -HE25L 4K",
-    "LYNX 3.0 LH35 3.0",
-    "LYNX 3.0 LH25 3.0",
-    "LYNX 3.0 LH19 3.0",
-    "LYNX 3.0 LH15 3.0",
-    "LYNX 3.0 LE15 3.0",
-    "LYNX 3.0 LE10 3.0",
-    "LYNX 2.0 - LH35 2.0",
-    "LYNX 2.0 - LH25 2.0",
-    "LYNX 2.0 - LH19 2.0",
-    "LYNX 2.0 - LH15 2.0",
-    "LYNX S - LE15 S",
-    "LYNX S - LE10 S",
-    "LYNX S - LC06 S",
-    "FALCON - FQ50L 2.0",
-    "FALCON -FQ50 2.0",
-    "FALCON - FQ35 2.0",
-    "FALCON - FQ25",
-    "FALCON - FH35",
-    "FALCON - FH25",
-    "PANTHER 2.0 PQ50L 2.0",
-    "PANTHER 2.0 PQ35L 2.0",
-    "PANTHER 2.0 PH50L 2.0",
-    "PANTHER 2.0 PH35L 2.0",
-    "THUNDER 2.0 TQ50 2.0",
-    "THUNDER 2.0 TQ35 2.0",
-    "THUNDER 2.0 TH35P 2.0",
-    "THUNDER 2.0 TH25P 2.0",
-    "THUNDER 2.0 TE25 2.0",
-    "THUNDER 2.0 TE19 2.0",
-    "THUNDER ZOOM 2.0 TQ60Z 2.0",
-    "THUNDER ZOOM 2.0 TH50Z 2.0",
-    "THUNDER 3.0 TQ50CL 3.0",
-    "THUNDER 3.0 TQ50C 3.0",
-    "THUNDER 3.0 TQ35C 3.0",
-    "THUNDER 3.0 TH35C 3.0",
-    "ALPEX 4K A50EL KIT",
-    "ALPEX 4K A50EL",
-    "ALPEX 4K A50E KIT",
-    "ALPEX 4K A50E",
-    "ALPEX LITE A40EL KIT TH4",
-    "ALPEX LITE A40EL + M4-IR850 Mini 250m Black Light (18350) + Bracket",
-    "ALPEX LITE A40EL",
-    "ALPEX LITE A40E KIT TH4",
-    "ALPEX LITE A40E + M4-IR850 Mini 250m Black Light (18350) + Bracket",
-    "ALPEX LITE A40E",
-    "ALPEX A50T-S KIT",
-    "ALPEX A50T-S",
-    "CHEETAH C32FSL KIT",
-    "CHEETAH C32FS KIT",
-    "M15 TRAIL CAMERA",
-    "M15 SP5000",
-    "M15 TRAIL CAMERA + SD card with SP5000",
-    "EXPLORER",
-    "M4-IR850 Mini 250m Black Light (18350)",
-    "M4-IR850 Mini 250m Black Light (18350) + Bracket"
-];
+
 
 const PurchaseRequestForm = () => {
     const { user } = useAuth();
@@ -84,6 +11,26 @@ const PurchaseRequestForm = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    const [products, setProducts] = useState([]);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/products`);
+                const data = await response.json();
+                if (response.ok) {
+                    setProducts(data.map(p => p.name));
+                }
+            } catch (err) {
+                console.error("Failed to load products", err);
+            } finally {
+                setLoadingProducts(false);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const [formData, setFormData] = useState({
         storeName: '',
@@ -112,7 +59,7 @@ const PurchaseRequestForm = () => {
         setShowDropdown(false);
     };
 
-    const filteredProducts = PRODUCT_LIST.filter(p =>
+    const filteredProducts = products.filter(p =>
         p.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -172,7 +119,7 @@ const PurchaseRequestForm = () => {
     };
 
     return (
-        <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 font-sans relative z-10">
+        <div className="min-h-screen bg-transparent py-8 px-[10px] sm:px-6 lg:px-8 font-sans relative z-10">
             <div className="max-w-3xl mx-auto space-y-4">
                 <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 relative">
                     <div className="h-2.5 w-full bg-gradient-to-r from-red-600 to-red-800"></div>
