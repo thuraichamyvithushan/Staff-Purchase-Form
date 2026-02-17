@@ -133,7 +133,7 @@ const getHtmlBody = (type, data) => {
 
   if (type === 'responseNotification') {
     const statusColor = request.status === 'Confirmed' ? '#16a34a' : (request.status === 'Rejected' ? '#dc2626' : '#ca8a04');
-    const statusText = request.status === 'Confirmed' ? 'Confirmed by Staff' : request.status;
+    const statusText = request.status === 'Confirmed' ? 'Confirmed' : request.status;
 
     const requestDetails = `
     <div style="padding: 30px 40px; background-color: ${containerBg};">
