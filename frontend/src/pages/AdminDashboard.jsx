@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
+
 
 
 const AdminDashboard = () => {
@@ -17,7 +19,7 @@ const AdminDashboard = () => {
         const fetchStats = async () => {
             try {
                 const token = await user.getIdToken();
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/purchase-requests`, {
+                const response = await fetch(`${API_BASE_URL}/api/admin/purchase-requests`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
