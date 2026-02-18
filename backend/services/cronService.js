@@ -5,11 +5,9 @@ const { sendEmail } = require('./emailService');
 const COLLECTION_NAME = 'purchaseRequests';
 
 const initCron = () => {
-  // LIVE MODE: Run daily at 8:00 AM
   cron.schedule('0 8 * * *', async () => {
     console.log('Running daily reminder check...');
     try {
-      // Get all pending requests
       const snapshot = await db.collection(COLLECTION_NAME).where('status', '==', 'Pending').get();
 
       if (snapshot.empty) {
@@ -26,23 +24,16 @@ const initCron = () => {
         const request = doc.data();
         const requestId = doc.id;
 
-        // Check if reminder was already sent today
         if (request.lastReminderSent) {
           const lastSent = new Date(request.lastReminderSent);
           lastSent.setHours(0, 0, 0, 0);
 
           if (lastSent.getTime() === today.getTime()) {
-            // Reminder already sent today, skip
             return;
           }
         }
 
-        // Logic to check if it's been 1 day could be added here if needed, 
-        // but "daily reminder" implies checking every day for pending items.
-        // Assuming every pending item gets a reminder once a day.
-
         const recipient = request.email;
-        // Fallback or specific logic if email is missing?
         if (!recipient) {
           console.log(`Skipping request ${requestId}: No email found.`);
           return;
@@ -54,7 +45,6 @@ const initCron = () => {
             token: request.responseToken
           });
 
-          // Update doc
           const emailLog = request.emailSentLog || [];
           emailLog.push({
             sentAt: new Date().toISOString(),
@@ -80,10 +70,8 @@ const initCron = () => {
   console.log('✓ Cron Job Scheduled (LIVE MODE: Daily Reminders at 8:00 AM)');
 };
 
-// Check overdues - removed as per new requirements
 const checkOverdues = async () => {
   console.log('Manual reminder check triggered');
-  // Implement manual trigger logic if needed, reusing the cron logic
 };
 
 module.exports = { initCron, checkOverdues };

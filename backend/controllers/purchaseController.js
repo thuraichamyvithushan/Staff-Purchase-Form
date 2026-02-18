@@ -4,18 +4,16 @@ const crypto = require('crypto');
 
 const COLLECTION_NAME = 'purchaseRequests';
 
-// Create new purchase request
 exports.createPurchaseRequest = async (req, res) => {
     try {
         const {
             storeName, employeeName, orderDate, invoiceDate,
             productModel, serialNumber, fob, discount,
-            rebate, email
+            rebate, email, publicEmail
         } = req.body;
 
         const responseToken = crypto.randomBytes(32).toString('hex');
 
-        // Use authenticated user if available, otherwise fallback to system default
         const adminEmail = req.user?.email || process.env.ADMIN_EMAIL || 'admin@huntsmanoptics.com';
         const adminName = req.user?.name || 'Staff Member';
 
@@ -30,7 +28,8 @@ exports.createPurchaseRequest = async (req, res) => {
             discount,
             rebate: rebate || '',
             email: email || '',
-            adminEmail, // Save who created it
+            publicEmail: publicEmail || '',
+            adminEmail,
             adminName,
             status: 'Pending',
             responseToken,
@@ -63,16 +62,13 @@ exports.createPurchaseRequest = async (req, res) => {
     }
 };
 
-// Get all requests (Admin only)
 exports.getPurchaseRequests = async (req, res) => {
     try {
         const { status, store, employee, startDate, endDate } = req.query;
         let query = db.collection(COLLECTION_NAME);
 
         if (status) query = query.where('status', '==', status);
-        // Note: Firestore doesn't support native regex search or partial matching easily without third-party services like Algolia.
-        // For basic filtering, we can filter in memory if dataset is small, or use exact matches.
-        // Here we'll fetch then filter for store/employee to keep it simple for now, or assume exact match if provided.
+
 
         const snapshot = await query.get();
         let requests = [];
@@ -81,7 +77,6 @@ exports.getPurchaseRequests = async (req, res) => {
             requests.push({ id: doc.id, ...doc.data() });
         });
 
-        // In-memory filtering for partial matches (Store/Employee)
         if (store) {
             requests = requests.filter(r => r.storeName.toLowerCase().includes(store.toLowerCase()));
         }
@@ -95,7 +90,6 @@ exports.getPurchaseRequests = async (req, res) => {
             requests = requests.filter(r => new Date(r.createdAt) <= new Date(endDate));
         }
 
-        // Sort by createdAt desc
         requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         res.json(requests);
@@ -104,7 +98,6 @@ exports.getPurchaseRequests = async (req, res) => {
     }
 };
 
-// Get single request
 exports.getPurchaseRequestById = async (req, res) => {
     try {
         const doc = await db.collection(COLLECTION_NAME).doc(req.params.id).get();
@@ -115,13 +108,11 @@ exports.getPurchaseRequestById = async (req, res) => {
     }
 };
 
-// Handle rebate response
 exports.handleResponse = async (req, res) => {
     try {
         const { token } = req.params;
         const { action } = req.query;
 
-        // Query by token
         const snapshot = await db.collection(COLLECTION_NAME).where('responseToken', '==', token).limit(1).get();
 
         if (snapshot.empty) {
@@ -137,8 +128,8 @@ exports.handleResponse = async (req, res) => {
 
         let newStatus;
         switch (action) {
-            case 'confirm': newStatus = 'Confirmed'; break; // Staff confirmed
-            case 'approve': newStatus = 'Approved'; break; // Legacy/Admin override
+            case 'confirm': newStatus = 'Confirmed'; break;
+            case 'approve': newStatus = 'Approved'; break;
             case 'reject': newStatus = 'Rejected'; break;
             case 'needinfo': newStatus = 'Need Info'; break;
             default: return res.status(400).json({ error: 'Invalid action' });
@@ -157,7 +148,6 @@ exports.handleResponse = async (req, res) => {
 
         await db.collection(COLLECTION_NAME).doc(doc.id).update(updates);
 
-        // Notify the Admin about the response
         const targetAdminEmail = process.env.ADMIN_EMAIL || request.adminEmail;
         if (targetAdminEmail) {
             await sendEmail(targetAdminEmail, 'responseNotification', {
@@ -174,7 +164,6 @@ exports.handleResponse = async (req, res) => {
     }
 };
 
-// Get request details by token (Public)
 exports.getRequestByToken = async (req, res) => {
     try {
         const { token } = req.params;
@@ -187,7 +176,6 @@ exports.getRequestByToken = async (req, res) => {
         const doc = snapshot.docs[0];
         const request = doc.data();
 
-        // Only return necessary public info
         const publicInfo = {
             storeName: request.storeName,
             employeeName: request.employeeName,
@@ -199,7 +187,8 @@ exports.getRequestByToken = async (req, res) => {
             orderDate: request.orderDate,
             invoiceDate: request.invoiceDate,
             status: request.status,
-            tokenUsed: request.tokenUsed
+            tokenUsed: request.tokenUsed,
+            publicEmail: request.publicEmail
         };
 
         res.json(publicInfo);
@@ -208,7 +197,6 @@ exports.getRequestByToken = async (req, res) => {
     }
 };
 
-// Delete request (Admin only)
 exports.deletePurchaseRequest = async (req, res) => {
     try {
         const { id } = req.params;

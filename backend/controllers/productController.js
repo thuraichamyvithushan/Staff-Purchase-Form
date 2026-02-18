@@ -2,7 +2,6 @@ const { db } = require('../config/firebase');
 
 const COLLECTION_NAME = 'products';
 
-// Get all products
 exports.getProducts = async (req, res) => {
     try {
         const snapshot = await db.collection(COLLECTION_NAME).orderBy('name').get();
@@ -16,7 +15,6 @@ exports.getProducts = async (req, res) => {
     }
 };
 
-// Add a new product
 exports.addProduct = async (req, res) => {
     try {
         const { name } = req.body;
@@ -24,7 +22,6 @@ exports.addProduct = async (req, res) => {
             return res.status(400).json({ error: 'Product name is required' });
         }
 
-        // Check for duplicate
         const snapshot = await db.collection(COLLECTION_NAME).where('name', '==', name).limit(1).get();
         if (!snapshot.empty) {
             return res.status(400).json({ error: 'Product already exists' });
@@ -42,7 +39,6 @@ exports.addProduct = async (req, res) => {
     }
 };
 
-// Delete a product
 exports.deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;

@@ -30,7 +30,16 @@ const PurchaseRequestForm = () => {
             }
         };
         fetchProducts();
-    }, []);
+
+        // Auto-fill for logged in admins
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                publicEmail: user.email || '',
+                employeeName: user.displayName || user.name || ''
+            }));
+        }
+    }, [user]);
 
     const [formData, setFormData] = useState({
         storeName: '',
@@ -42,7 +51,8 @@ const PurchaseRequestForm = () => {
         fob: '',
         discount: '',
         rebate: '',
-        email: ''
+        email: '',
+        publicEmail: ''
     });
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -104,7 +114,8 @@ const PurchaseRequestForm = () => {
                 fob: '',
                 discount: '',
                 rebate: '',
-                email: ''
+                email: '',
+                publicEmail: ''
             });
             setSearchTerm('');
 
@@ -160,6 +171,21 @@ const PurchaseRequestForm = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200 group focus-within:shadow-md transition-shadow">
+                        <label className="block text-base font-medium text-gray-900 mb-2">
+                            Enter Your Email <span className="text-red-600">*</span>
+                        </label>
+                        <p className="text-xs text-gray-500 mb-6 italic">Please provide your contact email (Person filling this form)</p>
+                        <input
+                            type="email"
+                            name="publicEmail"
+                            required
+                            value={formData.publicEmail}
+                            onChange={handleChange}
+                            className="w-full sm:w-2/3 border-b border-gray-300 focus:border-red-600 focus:outline-none py-2 transition-all duration-300 bg-transparent text-gray-900 placeholder-gray-400 group-focus-within:border-red-600"
+                            placeholder="Your contact email"
+                        />
+                    </div>
                     <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200 group focus-within:shadow-md transition-shadow">
                         <label className="block text-base font-medium text-gray-900 mb-6">
                             Store Name <span className="text-red-600">*</span>
@@ -319,6 +345,8 @@ const PurchaseRequestForm = () => {
                         />
                     </div>
 
+
+
                     <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200 group focus-within:shadow-md transition-shadow">
                         <label className="block text-base font-medium text-gray-900 mb-6">
                             Email (Sight APP Registration) <span className="text-red-600">*</span>
@@ -357,7 +385,8 @@ const PurchaseRequestForm = () => {
                                         fob: '',
                                         discount: '',
                                         rebate: '',
-                                        email: ''
+                                        email: '',
+                                        publicEmail: ''
                                     });
                                     setSearchTerm('');
                                     window.scrollTo(0, 0);
