@@ -178,7 +178,7 @@ const ResponseConfirmation = () => {
                             <div className="space-y-10">
                                 {action === 'confirm' ? (
                                     <div className="bg-red-50/50 rounded-[2rem] p-8 sm:p-10 border border-red-100/50">
-                                        <h4 className="text-red-900 font-black text-sm uppercase tracking-widest mb-6 border-b border-red-100 pb-4">Terms & Conditions</h4>
+                                        <h4 className="text-red-900 font-black text-sm uppercase tracking-widest mb-6 border-b border-red-100 pb-4">CONFIRMATION & ACCEPTANCE</h4>
                                         <div className="space-y-5">
                                             <label className="flex items-start space-x-4 group cursor-pointer">
                                                 <div className="relative flex items-center mt-1">
@@ -193,7 +193,11 @@ const ResponseConfirmation = () => {
                                                     </svg>
                                                 </div>
                                                 <span className="text-red-800 text-sm font-bold leading-relaxed group-hover:text-red-900 transition-colors">
-                                                    I agree to register for the Sight App and acknowledge the 14-month possession rule.
+                                                   By submitting this form, I confirm that:<br/>
+
+                                                 I agree to register for the Sight App using the same email address provided above.<br/>
+                                                 I acknowledge that the device must remain in my possession for a minimum period of 14 months.<br/>
+                                                 I request confirmation of receipt within 30 days.
                                                 </span>
                                             </label>
                                         </div>
