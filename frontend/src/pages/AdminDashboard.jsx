@@ -54,7 +54,7 @@ const AdminDashboard = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path>
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">Create & Send New Purchase Form</h2>
+                    <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">Send New Purchase Form</h2>
                     <p className="text-gray-500 text-lg font-medium leading-relaxed max-w-sm">Generate a new purchase request and send it for approval.</p>
                 </div>
 
