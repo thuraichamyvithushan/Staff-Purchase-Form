@@ -197,6 +197,23 @@ exports.getRequestByToken = async (req, res) => {
     }
 };
 
+exports.updatePurchaseRequest = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = { ...req.body, updatedAt: new Date().toISOString() };
+
+        // Remove fields that shouldn't be updated manually if necessary
+        delete updates.id;
+        delete updates.createdAt;
+
+        await db.collection(COLLECTION_NAME).doc(id).update(updates);
+        res.json({ message: 'Request updated successfully' });
+    } catch (error) {
+        console.error('Error updating purchase request:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 exports.deletePurchaseRequest = async (req, res) => {
     try {
         const { id } = req.params;

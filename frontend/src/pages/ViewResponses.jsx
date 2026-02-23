@@ -17,6 +17,8 @@ const ViewResponses = () => {
 
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState({});
 
     const [requestToDelete, setRequestToDelete] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -52,6 +54,34 @@ const ViewResponses = () => {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleUpdate = async () => {
+        try {
+            const token = await user.getIdToken();
+            const response = await fetch(
+                `${API_BASE_URL}/api/admin/purchase-requests/${selectedRequest.id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(editData)
+                }
+            );
+
+            if (response.ok) {
+                setRequests(requests.map(r => r.id === selectedRequest.id ? { ...r, ...editData } : r));
+                setSelectedRequest({ ...selectedRequest, ...editData });
+                setIsEditing(false);
+            } else {
+                const data = await response.json();
+                setError(data.error || 'Failed to update request');
+            }
+        } catch (err) {
+            setError(err.message);
         }
     };
 
@@ -105,10 +135,19 @@ const ViewResponses = () => {
         }
     };
 
-    const renderModalField = (label, value) => (
+    const renderModalField = (label, value, fieldName) => (
         <div className="py-4 border-b border-gray-50 last:border-0 flex flex-col sm:flex-row sm:items-start justify-between group gap-2">
             <span className="text-gray-400 font-black uppercase tracking-[0.2em] text-[10px] sm:w-1/3 flex-shrink-0 pt-1">{label}</span>
-            <span className="text-gray-900 font-bold text-sm sm:text-right leading-relaxed break-words flex-grow">{value || '---'}</span>
+            {isEditing && fieldName ? (
+                <input
+                    type="text"
+                    value={editData[fieldName] || ''}
+                    onChange={(e) => setEditData({ ...editData, [fieldName]: e.target.value })}
+                    className="flex-grow bg-gray-50 border-b border-red-600 focus:outline-none py-1 px-2 font-bold text-sm text-gray-900 rounded"
+                />
+            ) : (
+                <span className="text-gray-900 font-bold text-sm sm:text-right leading-relaxed break-words flex-grow">{value || '---'}</span>
+            )}
         </div>
     );
 
@@ -214,6 +253,8 @@ const ViewResponses = () => {
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Employee</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Product</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Email</th>
+                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">FOB</th>
+                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Rebate</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Created</th>
                                     <th className="px-8 py-6 text-center text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Actions</th>
@@ -253,6 +294,12 @@ const ViewResponses = () => {
                                                     {request.email || '-'}
                                                 </span>
                                             </td>
+                                            <td className="px-8 py-6 whitespace-nowrap">
+                                                <span className="text-sm font-bold text-gray-700">{request.fob || '-'}</span>
+                                            </td>
+                                            <td className="px-8 py-6 whitespace-nowrap">
+                                                <span className="text-sm font-bold text-gray-700">{request.rebate || '-'}</span>
+                                            </td>
                                             <td className="px-8 py-6 whitespace-nowrap text-sm">
                                                 <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${getStatusColor(request.status)}`}>
                                                     {request.status}
@@ -264,7 +311,7 @@ const ViewResponses = () => {
                                             <td className="px-8 py-6 whitespace-nowrap text-center">
                                                 <div className="flex items-center justify-center space-x-3">
                                                     <button
-                                                        onClick={() => { setSelectedRequest(request); setIsViewModalOpen(true); }}
+                                                        onClick={() => { setSelectedRequest(request); setEditData(request); setIsViewModalOpen(true); setIsEditing(false); }}
                                                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors duration-300"
                                                         title="View Details"
                                                     >
@@ -311,11 +358,11 @@ const ViewResponses = () => {
                         <div className="p-10 sm:p-14">
                             <div className="flex justify-between items-center mb-10">
                                 <div>
-                                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">Request Details</h2>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Full Submission Summary</p>
+                                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">{isEditing ? 'Edit Request' : 'Request Details'}</h2>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{isEditing ? 'Update rebate and FOB details' : 'Full Submission Summary'}</p>
                                 </div>
                                 <button
-                                    onClick={() => setIsViewModalOpen(false)}
+                                    onClick={() => { setIsViewModalOpen(false); setIsEditing(false); }}
                                     className="p-3 bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-300"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -335,22 +382,47 @@ const ViewResponses = () => {
                                     </div>
                                     <div className="space-y-0">
                                         {renderModalField('Serial Number', selectedRequest.serialNumber)}
-                                        {renderModalField('FOB Price', selectedRequest.fob)}
+                                        {renderModalField('FOB Price', selectedRequest.fob, 'fob')}
                                         {renderModalField('Discount', selectedRequest.discount)}
-                                        {renderModalField('Rebate Type', selectedRequest.rebate)}
+                                        {renderModalField('Rebate Type', selectedRequest.rebate, 'rebate')}
                                         {renderModalField('Order Date', new Date(selectedRequest.orderDate).toLocaleDateString())}
                                         {renderModalField('Invoice Date', new Date(selectedRequest.invoiceDate).toLocaleDateString())}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-12 pt-8 border-t border-gray-100 flex justify-end">
-                                <button
-                                    onClick={() => setIsViewModalOpen(false)}
-                                    className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all duration-300 transform active:scale-95 shadow-lg"
-                                >
-                                    Close Details
-                                </button>
+                            <div className="mt-12 pt-8 border-t border-gray-100 flex justify-end space-x-4">
+                                {isEditing ? (
+                                    <>
+                                        <button
+                                            onClick={() => setIsEditing(false)}
+                                            className="px-8 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300 transform active:scale-95"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleUpdate}
+                                            className="px-8 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all duration-300 transform active:scale-95 shadow-lg"
+                                        >
+                                            Save Changes
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={() => setIsEditing(true)}
+                                            className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all duration-300 transform active:scale-95 shadow-lg"
+                                        >
+                                            Edit Details
+                                        </button>
+                                        <button
+                                            onClick={() => setIsViewModalOpen(false)}
+                                            className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all duration-300 transform active:scale-95 shadow-lg"
+                                        >
+                                            Close
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

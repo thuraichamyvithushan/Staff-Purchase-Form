@@ -7,10 +7,10 @@ const { auth: firebaseAuth, db } = require('./config/firebase');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-
 app.use(cors({
     origin: [
         'https://staffpurchaseaus.hointernal.com',
+        'https://staff-purchase-form-8eqd.vercel.app',
         'http://localhost:5173'
     ],
     credentials: true
@@ -43,6 +43,7 @@ app.post('/api/public/purchase-requests', purchaseController.createPurchaseReque
 app.post('/api/admin/purchase-requests', authController.protect, authController.adminOnly, purchaseController.createPurchaseRequest);
 app.get('/api/admin/purchase-requests', authController.protect, authController.adminOnly, purchaseController.getPurchaseRequests);
 app.get('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.getPurchaseRequestById);
+app.put('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.updatePurchaseRequest);
 app.post('/api/admin/test-reminder', authController.protect, authController.adminOnly, purchaseController.testReminder);
 app.delete('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.deletePurchaseRequest);
 
