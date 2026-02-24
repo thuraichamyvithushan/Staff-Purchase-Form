@@ -21,6 +21,7 @@ const getSubject = (type, data) => {
       const prefix = data.action === 'confirm' ? ' CONFIRMED' : (data.action === 'reject' ? ' REJECTED' : ' UPDATE');
       return `${prefix}: Purchase Request - ${data.request.employeeName} (${data.request.storeName})`;
     case 'registrationReceivedUser': return `Registration Received - Huntsman Optics`;
+    case 'purchaseRequestConfirmation': return `Purchase Request Received - Huntsman Optics`;
     case 'newRegistrationAdmin': return `ALERT: New User Registration Pending Approval`;
     case 'roleUpdated': return `Access Policy Updated - Huntsman Optics`;
     default: return 'Staff Purchase Request Notification';
@@ -282,6 +283,45 @@ const getHtmlBody = (type, data) => {
             <div style="padding: 40px; text-align: center; background-color: ${containerBg}; border-radius: 0 0 16px 16px; border-top: 1px solid #f1f5f9;">
                 <p style="color: ${textLight}; font-size: 14px; font-weight: 500; margin-bottom: 25px;">You can now log in and access the features assigned to your new role.</p>
                 <a href="${BASE_URL}/dashboard" style="background: #dc2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: 800; font-size: 14px; display: inline-block;">Go to Dashboard</a>
+            </div>
+            ${footer}
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  if (type === 'purchaseRequestConfirmation') {
+    const requestDetails = `
+    <div style="padding: 30px 40px; background-color: ${containerBg};">
+      <h3 style="margin-top: 0; color: ${textDark}; font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; items-center;">
+        <span style="width: 4px; height: 18px; background-color: ${primaryRed}; border-radius: 2px; margin-right: 10px; display: inline-block; vertical-align: middle;"></span>
+        <span style="vertical-align: middle;">Request Summary</span>
+      </h3>
+      <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+        <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Store</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${_esc(request.storeName)}</td></tr>
+        <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Product</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${primaryRed};">${_esc(request.productModel)}</td></tr>
+        <tr><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; color: ${textLight}; font-size: 14px; font-weight: 500;">Date</td><td style="padding: 12px 0; border-bottom: 1px solid #f8fafc; font-weight: 700; text-align: right; color: ${textDark};">${new Date(request.createdAt).toLocaleDateString('en-AU')}</td></tr>
+      </table>
+    </div>
+    `;
+
+    return `
+      <html>
+        <body style="${commonStyles}">
+          <div style="max-width: 600px; margin: 0 auto;">
+            ${header}
+            <div style="padding: 40px; text-align: center; background-color: ${containerBg};">
+                <div style="margin-bottom: 20px; display: inline-block; padding: 10px 20px; border-radius: 99px; background-color: #ca8a0410;">
+                  <span style="color: #ca8a04; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 14px;">Status: Under Review</span>
+                </div>
+                <h2 style="color: ${textDark}; margin: 0; font-size: 24px; font-weight: 800;">Thank you for your submission</h2>
+                <p style="color: ${textLight}; margin-top: 15px; font-size: 16px;">Hello <strong>${_esc(request.employeeName)}</strong>,</p>
+                <p style="color: ${textLight}; line-height: 1.8;">We have received your staff purchase request. Our administration team is currently reviewing the details. You will be notified once the request has been processed.</p>
+            </div>
+            ${requestDetails}
+            <div style="padding: 40px; text-align: center; border-radius: 0 0 16px 16px; border-top: 1px solid #f1f5f9; background-color: ${containerBg};">
+              <p style="color: #64748b; font-size: 13px;">This is an automated confirmation of your request receipt. No further action is required at this time.</p>
             </div>
             ${footer}
           </div>

@@ -54,6 +54,14 @@ exports.createPurchaseRequest = async (req, res) => {
             });
         }
 
+        // Send confirmation email to the person who filled the form (publicEmail)
+        const confirmationEmail = publicEmail || email;
+        if (confirmationEmail) {
+            await sendEmail(confirmationEmail, 'purchaseRequestConfirmation', {
+                request: requestData
+            });
+        }
+
         res.status(201).json({ message: 'Purchase Request created and sent successfully', id: docRef.id });
 
     } catch (error) {
