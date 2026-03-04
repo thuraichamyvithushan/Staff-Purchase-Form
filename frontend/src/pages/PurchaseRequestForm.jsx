@@ -288,19 +288,7 @@ const PurchaseRequestForm = () => {
                         />
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200 group focus-within:shadow-md transition-shadow">
-                        <label className="block text-base font-medium text-gray-900 mb-6">
-                            Serial Number
-                        </label>
-                        <input
-                            type="text"
-                            name="serialNumber"
-                            value={formData.serialNumber}
-                            onChange={handleChange}
-                            className="w-full sm:w-2/3 border-b border-gray-300 focus:border-red-600 focus:outline-none py-2 transition-all duration-300 bg-transparent text-gray-900 placeholder-gray-400 group-focus-within:border-red-600"
-                            placeholder="Your answer"
-                        />
-                    </div>
+
 
 
 
