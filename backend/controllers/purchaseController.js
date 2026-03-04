@@ -189,6 +189,7 @@ exports.getRequestByToken = async (req, res) => {
             employeeName: request.employeeName,
             productModel: request.productModel,
             discount: request.discount,
+            email: request.email,
             serialNumber: request.serialNumber,
             fob: request.fob,
             rebate: request.rebate,

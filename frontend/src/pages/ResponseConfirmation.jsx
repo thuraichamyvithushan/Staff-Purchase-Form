@@ -166,6 +166,8 @@ const ResponseConfirmation = () => {
                                     {renderDetailRow('Store Name', requestData.storeName)}
                                     {renderDetailRow('Employee Name', requestData.employeeName)}
                                     {renderDetailRow('Product Model', requestData.productModel, true)}
+                                    {renderDetailRow('Contact Email', requestData.publicEmail)}
+                                    {renderDetailRow('Sight App Email', requestData.email)}
                                     {renderDetailRow('Discount Applied', requestData.discount)}
                                     {requestData.serialNumber && renderDetailRow('Serial Number', requestData.serialNumber)}
                                     {requestData.fob && renderDetailRow('FOB', requestData.fob)}
@@ -193,11 +195,11 @@ const ResponseConfirmation = () => {
                                                     </svg>
                                                 </div>
                                                 <span className="text-red-800 text-sm font-bold leading-relaxed group-hover:text-red-900 transition-colors">
-                                                   By submitting this form, I confirm that:<br/>
+                                                    By submitting this form, I confirm that:<br />
 
-                                                 I agree to register for the Sight App using the same email address provided above.<br/>
-                                                 I acknowledge that the device must remain in my possession for a minimum period of 14 months.<br/>
-                                                 I request confirmation of receipt within 30 days.
+                                                    I agree to register for the Sight App using the same email address provided above.<br />
+                                                    I acknowledge that the device must remain in my possession for a minimum period of 14 months.<br />
+                                                    I request confirmation of receipt within 30 days.
                                                 </span>
                                             </label>
                                         </div>

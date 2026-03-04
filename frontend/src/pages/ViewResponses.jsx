@@ -252,7 +252,8 @@ const ViewResponses = () => {
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Store</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Employee</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Product</th>
-                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Email</th>
+                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contact Email</th>
+                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Sight App Email</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">FOB</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Rebate</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
@@ -288,6 +289,11 @@ const ViewResponses = () => {
                                             </td>
                                             <td className="px-8 py-6 whitespace-nowrap">
                                                 <span className="text-sm font-bold text-red-700 bg-red-50 px-3 py-1 rounded-lg">{request.productModel}</span>
+                                            </td>
+                                            <td className="px-8 py-6 whitespace-nowrap">
+                                                <span className="text-sm font-medium text-gray-600 truncate max-w-[150px]" title={request.publicEmail}>
+                                                    {request.publicEmail || '-'}
+                                                </span>
                                             </td>
                                             <td className="px-8 py-6 whitespace-nowrap">
                                                 <span className="text-sm font-medium text-gray-600 truncate max-w-[150px]" title={request.email}>
@@ -377,11 +383,12 @@ const ViewResponses = () => {
                                         {renderModalField('Store Name', selectedRequest.storeName)}
                                         {renderModalField('Employee Name', selectedRequest.employeeName)}
                                         {renderModalField('Product Model', selectedRequest.productModel)}
-                                        {renderModalField('Email Address', selectedRequest.email)}
+                                        {renderModalField('Contact Email', selectedRequest.publicEmail)}
+                                        {renderModalField('Sight App Email', selectedRequest.email)}
                                         {renderModalField('Status', selectedRequest.status)}
                                     </div>
                                     <div className="space-y-0">
-                                        {renderModalField('Serial Number', selectedRequest.serialNumber)}
+                                        {renderModalField('Serial Number', selectedRequest.serialNumber, 'serialNumber')}
                                         {renderModalField('FOB Price', selectedRequest.fob, 'fob')}
                                         {renderModalField('Discount', selectedRequest.discount)}
                                         {renderModalField('Rebate Type', selectedRequest.rebate, 'rebate')}
