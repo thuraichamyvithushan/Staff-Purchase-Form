@@ -249,9 +249,11 @@ const ViewResponses = () => {
                         <table className="min-w-full">
                             <thead>
                                 <tr className="bg-gray-50/50">
+                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">S/N</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Store</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Employee</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Product</th>
+                                    <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Serial Number</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contact Email</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Sight App Email</th>
                                     <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">FOB</th>
@@ -264,7 +266,7 @@ const ViewResponses = () => {
                             <tbody className="divide-y divide-gray-100">
                                 {requests.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="px-8 py-20 text-center">
+                                        <td colSpan="12" className="px-8 py-20 text-center">
                                             <div className="flex flex-col items-center">
                                                 <svg className="w-20 h-20 text-gray-100 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -274,8 +276,11 @@ const ViewResponses = () => {
                                         </td>
                                     </tr>
                                 ) : (
-                                    requests.map((request) => (
+                                    requests.map((request, index) => (
                                         <tr key={request.id} className="hover:bg-red-50/30 transition-colors duration-200 group">
+                                            <td className="px-8 py-6 whitespace-nowrap text-sm font-bold text-gray-400">
+                                                {index + 1}
+                                            </td>
                                             <td className="px-8 py-6 whitespace-nowrap">
                                                 <span className="text-sm font-bold text-gray-900">{request.storeName}</span>
                                             </td>
@@ -289,6 +294,9 @@ const ViewResponses = () => {
                                             </td>
                                             <td className="px-8 py-6 whitespace-nowrap">
                                                 <span className="text-sm font-bold text-red-700 bg-red-50 px-3 py-1 rounded-lg">{request.productModel}</span>
+                                            </td>
+                                            <td className="px-8 py-6 whitespace-nowrap">
+                                                <span className="text-sm font-bold text-gray-700">{request.serialNumber || '-'}</span>
                                             </td>
                                             <td className="px-8 py-6 whitespace-nowrap">
                                                 <span className="text-sm font-medium text-gray-600 truncate max-w-[150px]" title={request.publicEmail}>
