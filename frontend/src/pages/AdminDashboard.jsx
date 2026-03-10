@@ -24,9 +24,10 @@ const AdminDashboard = () => {
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    const pending = data.filter(r => r.status === 'Pending').length;
-                    const confirmed = data.filter(r => r.status === 'Confirmed').length;
-                    const rejected = data.filter(r => r.status === 'Rejected').length;
+                    const requestsArray = data.requests || [];
+                    const pending = requestsArray.filter(r => r.status === 'Pending').length;
+                    const confirmed = requestsArray.filter(r => r.status === 'Confirmed').length;
+                    const rejected = requestsArray.filter(r => r.status === 'Rejected').length;
                     setStats({ pending, confirmed, rejected });
                 }
             } catch (err) {
