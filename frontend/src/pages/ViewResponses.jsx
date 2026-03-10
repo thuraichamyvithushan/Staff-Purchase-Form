@@ -7,6 +7,7 @@ const ViewResponses = () => {
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
     const [requests, setRequests] = useState([]);
+    const [counts, setCounts] = useState({ active: 0, archived: 0 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [filters, setFilters] = useState({
@@ -48,7 +49,11 @@ const ViewResponses = () => {
 
             const data = await response.json();
             if (response.ok) {
-                setRequests(data);
+                setRequests(data.requests || []);
+                setCounts({
+                    active: data.activeCount || 0,
+                    archived: data.archivedCount || 0
+                });
             } else {
                 setError(data.error || 'Failed to fetch requests');
             }
@@ -101,7 +106,7 @@ const ViewResponses = () => {
             );
 
             if (response.ok) {
-                setRequests(requests.filter(r => r.id !== requestToDelete));
+                fetchRequests(); // Refetch to get updated counts
                 setIsDeleteModalOpen(false);
                 setRequestToDelete(null);
             } else {
@@ -127,7 +132,7 @@ const ViewResponses = () => {
             );
 
             if (response.ok) {
-                setRequests(requests.filter(r => r.id !== id));
+                fetchRequests();
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to archive request');
@@ -149,7 +154,7 @@ const ViewResponses = () => {
             );
 
             if (response.ok) {
-                setRequests(requests.filter(r => r.id !== id));
+                fetchRequests();
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to unarchive request');
@@ -330,13 +335,13 @@ const ViewResponses = () => {
                             onClick={() => setFilters({ ...filters, isArchived: false })}
                             className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${!filters.isArchived ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                         >
-                            Active
+                            Active ({counts.active})
                         </button>
                         <button
                             onClick={() => setFilters({ ...filters, isArchived: true })}
                             className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${filters.isArchived ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                         >
-                            Archived
+                            Archived ({counts.archived})
                         </button>
                     </div>
                     <button

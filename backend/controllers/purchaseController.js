@@ -79,35 +79,38 @@ exports.getPurchaseRequests = async (req, res) => {
         if (status) query = query.where('status', '==', status);
 
         const snapshot = await query.get();
-        let requests = [];
-
-        const archivedFilter = isArchived === 'true';
+        let allFilteredRequests = [];
 
         snapshot.forEach(doc => {
-            const data = doc.data();
-            const archivedValue = data.isArchived || false;
-
-            if (archivedValue === archivedFilter) {
-                requests.push({ id: doc.id, ...data });
-            }
+            allFilteredRequests.push({ id: doc.id, ...doc.data() });
         });
 
         if (store) {
-            requests = requests.filter(r => r.storeName.toLowerCase().includes(store.toLowerCase()));
+            allFilteredRequests = allFilteredRequests.filter(r => r.storeName.toLowerCase().includes(store.toLowerCase()));
         }
         if (employee) {
-            requests = requests.filter(r => r.employeeName.toLowerCase().includes(employee.toLowerCase()));
+            allFilteredRequests = allFilteredRequests.filter(r => r.employeeName.toLowerCase().includes(employee.toLowerCase()));
         }
         if (startDate) {
-            requests = requests.filter(r => new Date(r.createdAt) >= new Date(startDate));
+            allFilteredRequests = allFilteredRequests.filter(r => new Date(r.createdAt) >= new Date(startDate));
         }
         if (endDate) {
-            requests = requests.filter(r => new Date(r.createdAt) <= new Date(endDate));
+            allFilteredRequests = allFilteredRequests.filter(r => new Date(r.createdAt) <= new Date(endDate));
         }
+
+        const activeCount = allFilteredRequests.filter(r => !(r.isArchived || false)).length;
+        const archivedCount = allFilteredRequests.filter(r => r.isArchived === true).length;
+
+        const archivedFilter = isArchived === 'true';
+        let requests = allFilteredRequests.filter(r => (r.isArchived || false) === archivedFilter);
 
         requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        res.json(requests);
+        res.json({
+            requests,
+            activeCount,
+            archivedCount
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
