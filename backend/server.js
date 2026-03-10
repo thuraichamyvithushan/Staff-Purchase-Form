@@ -44,6 +44,8 @@ app.post('/api/admin/purchase-requests', authController.protect, authController.
 app.get('/api/admin/purchase-requests', authController.protect, authController.adminOnly, purchaseController.getPurchaseRequests);
 app.get('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.getPurchaseRequestById);
 app.put('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.updatePurchaseRequest);
+app.put('/api/admin/purchase-requests/:id/archive', authController.protect, authController.adminOnly, purchaseController.archivePurchaseRequest);
+app.put('/api/admin/purchase-requests/:id/unarchive', authController.protect, authController.adminOnly, purchaseController.unarchivePurchaseRequest);
 app.post('/api/admin/test-reminder', authController.protect, authController.adminOnly, purchaseController.testReminder);
 app.delete('/api/admin/purchase-requests/:id', authController.protect, authController.adminOnly, purchaseController.deletePurchaseRequest);
 

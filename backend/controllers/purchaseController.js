@@ -32,6 +32,7 @@ exports.createPurchaseRequest = async (req, res) => {
             adminEmail,
             adminName,
             status: 'Pending',
+            isArchived: false,
             responseToken,
             tokenUsed: false,
             reminderCount: 0,
@@ -72,17 +73,23 @@ exports.createPurchaseRequest = async (req, res) => {
 
 exports.getPurchaseRequests = async (req, res) => {
     try {
-        const { status, store, employee, startDate, endDate } = req.query;
+        const { status, store, employee, startDate, endDate, isArchived } = req.query;
         let query = db.collection(COLLECTION_NAME);
 
         if (status) query = query.where('status', '==', status);
 
-
         const snapshot = await query.get();
         let requests = [];
 
+        const archivedFilter = isArchived === 'true';
+
         snapshot.forEach(doc => {
-            requests.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            const archivedValue = data.isArchived || false;
+
+            if (archivedValue === archivedFilter) {
+                requests.push({ id: doc.id, ...data });
+            }
         });
 
         if (store) {
@@ -235,6 +242,32 @@ exports.deletePurchaseRequest = async (req, res) => {
 
         await docRef.delete();
         res.json({ message: 'Request deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.archivePurchaseRequest = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.collection(COLLECTION_NAME).doc(id).update({
+            isArchived: true,
+            updatedAt: new Date().toISOString()
+        });
+        res.json({ message: 'Request archived successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.unarchivePurchaseRequest = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.collection(COLLECTION_NAME).doc(id).update({
+            isArchived: false,
+            updatedAt: new Date().toISOString()
+        });
+        res.json({ message: 'Request unarchived successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

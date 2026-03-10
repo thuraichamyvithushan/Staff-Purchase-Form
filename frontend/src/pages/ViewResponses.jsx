@@ -12,7 +12,8 @@ const ViewResponses = () => {
     const [filters, setFilters] = useState({
         status: searchParams.get('status') || '',
         store: '',
-        employee: ''
+        employee: '',
+        isArchived: false
     });
 
     const [selectedRequest, setSelectedRequest] = useState(null);
@@ -26,7 +27,7 @@ const ViewResponses = () => {
 
     useEffect(() => {
         fetchRequests();
-    }, [user, filters.status]);
+    }, [user, filters.status, filters.isArchived]);
 
     const fetchRequests = async () => {
         try {
@@ -36,6 +37,7 @@ const ViewResponses = () => {
             if (filters.status) queryParams.append('status', filters.status);
             if (filters.store) queryParams.append('store', filters.store);
             if (filters.employee) queryParams.append('employee', filters.employee);
+            queryParams.append('isArchived', filters.isArchived);
 
             const response = await fetch(
                 `${API_BASE_URL}/api/admin/purchase-requests?${queryParams}`,
@@ -113,6 +115,86 @@ const ViewResponses = () => {
         }
     };
 
+    const handleArchive = async (id) => {
+        try {
+            const token = await user.getIdToken();
+            const response = await fetch(
+                `${API_BASE_URL}/api/admin/purchase-requests/${id}/archive`,
+                {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            if (response.ok) {
+                setRequests(requests.filter(r => r.id !== id));
+            } else {
+                const data = await response.json();
+                setError(data.error || 'Failed to archive request');
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleUnarchive = async (id) => {
+        try {
+            const token = await user.getIdToken();
+            const response = await fetch(
+                `${API_BASE_URL}/api/admin/purchase-requests/${id}/unarchive`,
+                {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+
+            if (response.ok) {
+                setRequests(requests.filter(r => r.id !== id));
+            } else {
+                const data = await response.json();
+                setError(data.error || 'Failed to unarchive request');
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleExport = () => {
+        if (requests.length === 0) return;
+
+        const headers = [
+            "S/N", "Store Name", "Employee Name", "Product Model",
+            "Serial Number", "Contact Email", "Sight App Email",
+            "FOB Price", "Rebate Type", "Status", "Created Date"
+        ];
+
+        const csvContent = [
+            headers.join(","),
+            ...requests.map((request, index) => [
+                index + 1,
+                `"${request.storeName || ''}"`,
+                `"${request.employeeName || ''}"`,
+                `"${request.productModel || ''}"`,
+                `"${request.serialNumber || ''}"`,
+                `"${request.publicEmail || ''}"`,
+                `"${request.email || ''}"`,
+                `"${request.fob || ''}"`,
+                `"${request.rebate || ''}"`,
+                `"${request.status || ''}"`,
+                `"${new Date(request.createdAt).toLocaleDateString()}"`
+            ].join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `purchase_requests_${filters.isArchived ? 'archived' : 'active'}_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const handleFilterChange = (e) => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
     };
@@ -122,7 +204,7 @@ const ViewResponses = () => {
     };
 
     const clearFilters = () => {
-        setFilters({ status: '', store: '', employee: '' });
+        setFilters({ status: '', store: '', employee: '', isArchived: false });
         setTimeout(() => fetchRequests(), 0);
     };
 
@@ -239,6 +321,35 @@ const ViewResponses = () => {
             )}
 
             <div className="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/20 overflow-hidden relative">
+                <div className="px-6 sm:px-8 py-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between bg-gray-50/30 gap-6">
+                    <h2 className="text-lg font-black text-gray-900 tracking-tight uppercase tracking-[0.1em]">
+                        {filters.isArchived ? 'Archived Requests' : 'Active Requests'}
+                    </h2>
+                    <div className="flex items-center space-x-2 bg-gray-100/50 p-1.5 rounded-2xl">
+                        <button
+                            onClick={() => setFilters({ ...filters, isArchived: false })}
+                            className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${!filters.isArchived ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                        >
+                            Active
+                        </button>
+                        <button
+                            onClick={() => setFilters({ ...filters, isArchived: true })}
+                            className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${filters.isArchived ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                        >
+                            Archived
+                        </button>
+                    </div>
+                    <button
+                        onClick={handleExport}
+                        disabled={requests.length === 0}
+                        className={`flex items-center space-x-2 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${requests.length === 0 ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700 shadow-sm shadow-green-200 active:scale-95'}`}
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
                 {loading ? (
                     <div className="flex flex-col justify-center items-center py-20 space-y-4">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 shadow-inner"></div>
@@ -334,6 +445,27 @@ const ViewResponses = () => {
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                         </svg>
                                                     </button>
+                                                    {filters.isArchived ? (
+                                                        <button
+                                                            onClick={() => handleUnarchive(request.id)}
+                                                            className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-colors duration-300"
+                                                            title="Unarchive Request"
+                                                        >
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                            </svg>
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleArchive(request.id)}
+                                                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-xl transition-colors duration-300"
+                                                            title="Archive Request"
+                                                        >
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                            </svg>
+                                                        </button>
+                                                    )}
                                                     <button
                                                         onClick={() => { setRequestToDelete(request.id); setIsDeleteModalOpen(true); }}
                                                         className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors duration-300"
