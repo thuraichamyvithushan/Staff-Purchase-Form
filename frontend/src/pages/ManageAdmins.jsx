@@ -93,15 +93,15 @@ const ManageAdmins = () => {
                 </div>
             )}
 
-            <div className="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/20 overflow-hidden relative">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                        <thead className="bg-gray-50/50">
-                            <tr>
-                                <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">User</th>
-                                <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Role</th>
-                                <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Last Access</th>
-                                <th className="px-8 py-6 text-right text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Actions</th>
+            <div className="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/20 relative">
+                <div className="max-h-[600px] overflow-auto custom-scrollbar border-t border-gray-100 rounded-b-[2.5rem]">
+                    <table className="min-w-full border-separate border-spacing-0">
+                        <thead className="sticky top-0 z-30">
+                            <tr className="bg-gray-100 shadow-sm">
+                                <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-100 sticky top-0">User</th>
+                                <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-100 sticky top-0">Role</th>
+                                <th className="px-8 py-6 text-left text-xs font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-100 sticky top-0">Last Access</th>
+                                <th className="px-8 py-6 text-right text-xs font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-100 sticky top-0">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
