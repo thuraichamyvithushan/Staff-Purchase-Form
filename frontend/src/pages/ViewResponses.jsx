@@ -602,7 +602,7 @@ const ViewResponses = () => {
                                 </svg>
                             </div>
                             <h3 className="text-xl font-black text-gray-900 mb-2">Delete Request?</h3>
-                            <p className="text-gray-500 text-sm mb-8 font-medium">This action cannot be undone. Are you sure you want to remove this record?</p>
+                            <p className="text-gray-500 text-sm mb-8 font-medium">This request and its response will move to the Recycle Bin, where an admin can restore them.</p>
                             <div className="flex flex-col space-y-3">
                                 <button
                                     onClick={handleDelete}

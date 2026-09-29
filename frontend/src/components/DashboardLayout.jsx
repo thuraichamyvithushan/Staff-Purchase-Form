@@ -29,6 +29,7 @@ const DashboardLayout = () => {
     ];
 
     if (user && role === 'admin') {
+        navLinks.push({ name: 'Recycle Bin', path: '/dashboard/recycle-bin' });
         navLinks.push({ name: 'Manage Admins', path: '/dashboard/admins' });
     }
 

@@ -1,0 +1,30 @@
+# Local environment and credentials at any depth
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+serviceAccount*.json
+service-account*.json
+*-firebase-adminsdk-*.json
+credentials.json
+
+# Dependencies, generated output, and deployment metadata
+node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+.cache/
+.vercel/
+
+# Logs and local editor/OS files
+logs/
+*.log
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

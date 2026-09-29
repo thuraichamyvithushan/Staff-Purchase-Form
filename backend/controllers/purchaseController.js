@@ -3,6 +3,7 @@ const { sendEmail } = require('../services/emailService');
 const crypto = require('crypto');
 
 const COLLECTION_NAME = 'purchaseRequests';
+const RECYCLE_BIN_COLLECTION = 'deletedPurchaseRequests';
 
 exports.createPurchaseRequest = async (req, res) => {
     try {
@@ -237,14 +238,87 @@ exports.deletePurchaseRequest = async (req, res) => {
     try {
         const { id } = req.params;
         const docRef = db.collection(COLLECTION_NAME).doc(id);
-        const doc = await docRef.get();
+        const deletedRef = db.collection(RECYCLE_BIN_COLLECTION).doc(id);
+        const adminDoc = await db.collection('users').doc(req.user.uid).get();
+        const admin = adminDoc.exists ? adminDoc.data() : {};
 
-        if (!doc.exists) {
-            return res.status(404).json({ error: 'Request not found' });
-        }
+        const moved = await db.runTransaction(async transaction => {
+            const [doc, deletedDoc] = await Promise.all([
+                transaction.get(docRef),
+                transaction.get(deletedRef)
+            ]);
+            if (!doc.exists || deletedDoc.exists) return false;
 
-        await docRef.delete();
-        res.json({ message: 'Request deleted successfully' });
+            transaction.set(deletedRef, {
+                request: doc.data(),
+                deletedAt: new Date().toISOString(),
+                deletedBy: {
+                    uid: req.user.uid,
+                    name: admin.name || req.user.name || req.user.email || 'Admin',
+                    email: admin.email || req.user.email || ''
+                }
+            });
+            transaction.delete(docRef);
+            return true;
+        });
+
+        if (!moved) return res.status(404).json({ error: 'Request not found' });
+        res.json({ message: 'Request moved to Recycle Bin' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getDeletedPurchaseRequests = async (req, res) => {
+    try {
+        const snapshot = await db.collection(RECYCLE_BIN_COLLECTION).get();
+        const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        requests.sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
+        res.json({ requests });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.restorePurchaseRequest = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const docRef = db.collection(COLLECTION_NAME).doc(id);
+        const deletedRef = db.collection(RECYCLE_BIN_COLLECTION).doc(id);
+
+        const result = await db.runTransaction(async transaction => {
+            const [doc, deletedDoc] = await Promise.all([
+                transaction.get(docRef),
+                transaction.get(deletedRef)
+            ]);
+            if (!deletedDoc.exists) return 'missing';
+            if (doc.exists) return 'conflict';
+
+            transaction.set(docRef, deletedDoc.data().request);
+            transaction.delete(deletedRef);
+            return 'restored';
+        });
+
+        if (result === 'missing') return res.status(404).json({ error: 'Deleted request not found' });
+        if (result === 'conflict') return res.status(409).json({ error: 'An active request already uses this ID' });
+        res.json({ message: 'Request restored successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.permanentlyDeletePurchaseRequest = async (req, res) => {
+    try {
+        const deletedRef = db.collection(RECYCLE_BIN_COLLECTION).doc(req.params.id);
+        const deleted = await db.runTransaction(async transaction => {
+            const doc = await transaction.get(deletedRef);
+            if (!doc.exists) return false;
+            transaction.delete(deletedRef);
+            return true;
+        });
+
+        if (!deleted) return res.status(404).json({ error: 'Deleted request not found' });
+        res.json({ message: 'Request permanently deleted' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

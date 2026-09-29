@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import PurchaseRequestForm from './pages/PurchaseRequestForm';
 import ViewResponses from './pages/ViewResponses';
+import RecycleBin from './pages/RecycleBin';
 import ResponseConfirmation from './pages/ResponseConfirmation';
 import ManageAdmins from './pages/ManageAdmins';
 import ManageProducts from './pages/ManageProducts';
@@ -76,6 +77,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="create-request" element={<PurchaseRequestForm />} />
             <Route path="responses" element={<ViewResponses />} />
+            <Route path="recycle-bin" element={<ProtectedRoute allowedRoles={['admin']}><RecycleBin /></ProtectedRoute>} />
             <Route path="admins" element={<ManageAdmins />} />
             <Route path="products" element={<ManageProducts />} />
             <Route path="profile" element={<Profile />} />
