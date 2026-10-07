@@ -1,17 +1,24 @@
 const { db } = require('../config/firebase');
 const { sendEmail } = require('../services/emailService');
 const crypto = require('crypto');
+const { normalizeEmail, isAuthorizedEmail, authorizedEmailMessage } = require('../utils/purchaseEmail');
 
 const COLLECTION_NAME = 'purchaseRequests';
 const RECYCLE_BIN_COLLECTION = 'deletedPurchaseRequests';
 
 exports.createPurchaseRequest = async (req, res) => {
     try {
+        const contactEmail = normalizeEmail(req.body?.publicEmail);
+        if (!isAuthorizedEmail(contactEmail)) {
+            return res.status(400).json({ error: authorizedEmailMessage });
+        }
+
         const {
             storeName, employeeName, orderDate, invoiceDate,
             productModel, serialNumber, fob, discount,
-            rebate, email, publicEmail
+            rebate, email
         } = req.body;
+        const publicEmail = contactEmail;
 
         const responseToken = crypto.randomBytes(32).toString('hex');
 

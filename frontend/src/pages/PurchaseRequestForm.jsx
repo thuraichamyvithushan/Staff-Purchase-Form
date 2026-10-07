@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
+import { normalizeEmail, isAuthorizedEmail, authorizedEmailMessage } from '../utils/purchaseEmail';
 
 
 
@@ -10,6 +11,8 @@ const PurchaseRequestForm = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const emailInputRef = useRef(null);
     const [success, setSuccess] = useState('');
 
     const [products, setProducts] = useState([]);
@@ -60,6 +63,10 @@ const PurchaseRequestForm = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (name === 'publicEmail') {
+            e.target.setCustomValidity('');
+            setEmailError('');
+        }
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -75,6 +82,14 @@ const PurchaseRequestForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const publicEmail = normalizeEmail(formData.publicEmail);
+        setSuccess('');
+        if (!isAuthorizedEmail(publicEmail)) {
+            setEmailError(authorizedEmailMessage);
+            emailInputRef.current?.focus();
+            return;
+        }
+        setEmailError('');
         setLoading(true);
         setError('');
         setSuccess('');
@@ -94,7 +109,7 @@ const PurchaseRequestForm = () => {
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ ...formData, publicEmail })
             });
 
             const data = await response.json();
@@ -172,19 +187,32 @@ const PurchaseRequestForm = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200 group focus-within:shadow-md transition-shadow">
-                        <label className="block text-base font-medium text-gray-900 mb-2">
+                        <label htmlFor="public-email" className="block text-base font-medium text-gray-900 mb-2">
                             Enter Your Email <span className="text-red-600">*</span>
                         </label>
                         <p className="text-xs text-gray-500 mb-6 italic">Please provide your contact email (Person filling this form)</p>
                         <input
+                            id="public-email"
+                            ref={emailInputRef}
                             type="email"
                             name="publicEmail"
                             required
                             value={formData.publicEmail}
                             onChange={handleChange}
+                            onBlur={(e) => {
+                                const email = normalizeEmail(e.target.value);
+                                setFormData(prev => ({ ...prev, publicEmail: email }));
+                            }}
+                            onInvalid={(e) => {
+                                e.target.setCustomValidity(authorizedEmailMessage);
+                                setEmailError(authorizedEmailMessage);
+                            }}
+                            aria-invalid={Boolean(emailError)}
+                            aria-describedby={emailError ? 'public-email-error' : undefined}
                             className="w-full sm:w-2/3 border-b border-gray-300 focus:border-red-600 focus:outline-none py-2 transition-all duration-300 bg-transparent text-gray-900 placeholder-gray-400 group-focus-within:border-red-600"
                             placeholder="Your contact email"
                         />
+                        {emailError && <p id="public-email-error" role="alert" className="mt-2 text-sm text-red-600">{emailError}</p>}
                     </div>
                     <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-200 group focus-within:shadow-md transition-shadow">
                         <label className="block text-base font-medium text-gray-900 mb-6">
@@ -339,6 +367,8 @@ const PurchaseRequestForm = () => {
                             <button
                                 type="button"
                                 onClick={() => {
+                                    setEmailError('');
+                                    emailInputRef.current?.setCustomValidity('');
                                     setFormData({
                                         storeName: '',
                                         employeeName: '',
